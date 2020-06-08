@@ -5,8 +5,6 @@ using UnityEngine;
 public class TestingGrid : MonoBehaviour{
 
     private Grid grid;
-    private Grid grid1;
-    private Grid grid2;
 
     public static Vector3 GetMouseWorldPosition()
     {
@@ -30,23 +28,16 @@ public class TestingGrid : MonoBehaviour{
 
     private void Start()
     {
-        grid = new Grid(4, 2, 10f, new Vector3(20, 0));
-        grid1 = new Grid(5, 3, 5f, new Vector3(0, -25f));
-        grid2 = new Grid(4, 4, 5f, new Vector3(-35f, -15f));
+        grid = new Grid(20, 10, 10f, Vector3.zero);
     }
 
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            grid.SetValue(TestingGrid.GetMouseWorldPosition(), 2);
-            grid1.SetValue(TestingGrid.GetMouseWorldPosition(), 9);
-            grid2.SetValue(TestingGrid.GetMouseWorldPosition(), 72);
-        }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            Debug.Log(grid.GetValue(TestingGrid.GetMouseWorldPosition()));
+            Vector3 position = TestingGrid.GetMouseWorldPosition();
+            int value = grid.GetValue(position);
+            grid.SetValue(position, value + 5);
         }
     }
 }

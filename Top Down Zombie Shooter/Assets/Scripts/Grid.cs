@@ -6,6 +6,9 @@ public class Grid {
 
     public const int sortingOrderDefault = 5000;
 
+    public const int HEAT_MAP_MAX_VALUE = 100;
+    public const int HEAT_MAP_MIN_VALUE = 0;
+
     private int width;
     private int height;
     private float cellsize;
@@ -73,7 +76,7 @@ public class Grid {
     {
         if (x >= 0 && y >= 0 && x < width && y < height)
         {
-            gridArray[x, y] = value;
+            gridArray[x, y] = Mathf.Clamp(value, HEAT_MAP_MIN_VALUE, HEAT_MAP_MAX_VALUE);
             debugTextArray[x, y].text = gridArray[x, y].ToString();
         }
     }
