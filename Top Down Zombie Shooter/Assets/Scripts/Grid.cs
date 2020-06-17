@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CodeMonkey.Utils;
 
 public class Grid {
 
@@ -15,6 +17,13 @@ public class Grid {
     private Vector3 originPosition;
     private int[,] gridArray;
     private TextMesh[,] debugTextArray;
+
+    public event EventHandler<OnGridValueChangedEventArgs> OnGridValueChanged;
+    public class OnGridValueChangedEventArgs : EventArgs
+    {
+        public int x;
+        public int y;
+    }
 
     // Create Text in the World
     public static TextMesh CreateWorldText(string text, Transform parent = null, Vector3 localPosition = default(Vector3), int fontSize = 40, Color? color = null, TextAnchor textAnchor = TextAnchor.UpperLeft, TextAlignment textAlignment = TextAlignment.Left, int sortingOrder = sortingOrderDefault)
@@ -59,6 +68,10 @@ public class Grid {
         }
         Debug.DrawLine(GetWorldPosition(0, height), GetWorldPosition(width, height), Color.white, 100f);
         Debug.DrawLine(GetWorldPosition(width, 0), GetWorldPosition(width, height), Color.white, 100f);
+
+        OnGridValueChanged += (object sender, OnGridValueChangedEventArgs eventArgs) => {
+            debugTextArray[eventArgs.x, eventArgs.y].text = gridArray[eventArgs.x, eventArgs.y].ToString();
+        };
     }
 
     private Vector3 GetWorldPosition(int x, int y)
@@ -77,7 +90,7 @@ public class Grid {
         if (x >= 0 && y >= 0 && x < width && y < height)
         {
             gridArray[x, y] = Mathf.Clamp(value, HEAT_MAP_MIN_VALUE, HEAT_MAP_MAX_VALUE);
-            debugTextArray[x, y].text = gridArray[x, y].ToString();
+            if (OnGridValueChanged != null) OnGridValueChanged(this, new OnGridValueChangedEventArgs { x = x, y = y });
         }
     }
 
@@ -105,5 +118,64 @@ public class Grid {
         int x, y;
         GetXY(worldPosition, out x, out y);
         return GetValue(x, y);
+    }
+
+    public int GetWidth()
+    {
+        return width;
+    }
+
+    public int GetHeight()
+    {
+        return height;
+    }
+
+    public float GetCellSize()
+    {
+        return cellsize;
+    }
+
+    public Vector3 GetWorldPositionEins(int x, int y)
+    {
+        return new Vector3(x, y) * cellsize + originPosition;
+    }
+
+    public void AddValue(int x, int y, int value)
+    {
+        SetValue(x, y, GetValue(x, y) + value);
+    }
+
+    public void AddValue(Vector3 worldPosition, int value, int fullValueRange, int totalRange)
+    {
+        int lowerValueAmount = Mathf.RoundToInt((float)value / (totalRange - fullValueRange));
+
+        GetXY(worldPosition, out int originX, out int originY);
+        for (int x = 0; x < totalRange; x++)
+        {
+            for (int y = 0; y < totalRange - x; y++)
+            {
+                int radius = x + y;
+                int addValueAmount = value;
+                if (radius >= fullValueRange)
+                {
+                    addValueAmount -= lowerValueAmount * (radius - fullValueRange);
+                }
+
+                AddValue(originX + x, originY + y, addValueAmount);
+
+                if (x != 0)
+                {
+                    AddValue(originX - x, originY + y, addValueAmount);
+                }
+                if (y != 0)
+                {
+                    AddValue(originX + x, originY - y, addValueAmount);
+                    if (x != 0)
+                    {
+                        AddValue(originX - x, originY - y, addValueAmount);
+                    }
+                }
+            }
+        }
     }
 }
