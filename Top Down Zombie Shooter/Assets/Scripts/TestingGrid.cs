@@ -31,7 +31,7 @@ public class TestingGrid : MonoBehaviour{
 
     private void Start()
     {
-        grid = new Grid(10, 5, 2f, Vector3.zero);
+        grid = new Grid(70, 70, 2f, new Vector3(-23, -23, 0));
 
         heatMapVisual.SetGrid(grid);
     }
@@ -41,8 +41,7 @@ public class TestingGrid : MonoBehaviour{
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 position = TestingGrid.GetMouseWorldPosition();
-            int value = grid.GetValue(position);
-            grid.SetValue(position, value + 5);
+            grid.AddValue(position, 100, 2, 20);
         }
     }
 }
