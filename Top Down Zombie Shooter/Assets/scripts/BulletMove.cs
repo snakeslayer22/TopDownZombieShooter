@@ -9,14 +9,14 @@ public class BulletMove : MonoBehaviour{
     static public bool sniper;
     static public bool LMG;
 
-    public float pistolSpeed = 15;
-    public float assultrifleSpeed = 20;
-    public float sniperSpeed = 50;
-    public float LMGSpeed = 17;
+    [SerializeField] float pistolSpeed = 15;
+    [SerializeField] float assultrifleSpeed = 20;
+    [SerializeField] float sniperSpeed = 50;
+    [SerializeField] float LMGSpeed = 17;
 
     private float speed = 0;
 
-    public float destroyAfterTime = 3;
+    [SerializeField] float destroyAfterTime = 3;
 
     private Rigidbody2D rb;
 
